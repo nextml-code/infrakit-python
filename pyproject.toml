@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "infrakit-python"
+version = "0.1.0"
+description = ""
+authors = ["Richard Löwenström <samedii@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+pydantic = "^2.9.2"
+requests = "^2.32.3"
+pydantic-settings = "^2.5.2"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.3.3"
+ipykernel = "^6.29.5"
+ipywidgets = "^8.1.5"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

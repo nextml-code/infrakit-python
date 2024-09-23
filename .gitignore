@@ -1,0 +1,8 @@
+*.pyc
+.venv
+venv
+.vscode
+.env.development.secrets
+.env.secrets
+dist
+notebooks
