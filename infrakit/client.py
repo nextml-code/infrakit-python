@@ -3,6 +3,8 @@ from __future__ import annotations
 from pydantic import BaseModel
 
 from .auth import Auth
+from .folder import Folder
+from .mode import Mode
 from .projects import Projects
 
 
@@ -14,7 +16,7 @@ class InfrakitClient(BaseModel):
         cls,
         username: str,
         password: str,
-        mode: str = "production",
+        mode: Mode = Mode.PRODUCTION,
     ) -> InfrakitClient:
         return cls(auth=Auth(username=username, password=password, mode=mode))
 
@@ -29,3 +31,7 @@ class InfrakitClient(BaseModel):
     @property
     def projects(self) -> Projects:
         return Projects(auth=self.auth)
+
+    @property
+    def folder(self) -> Folder:
+        return Folder(auth=self.auth)
