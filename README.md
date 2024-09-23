@@ -1,17 +1,19 @@
-# Unofficial Infrakit API Client for Python
+# infrakit-python
+
+Unofficial Infrakit API client for python.
 
 ## Installation
 
 ```bash
-poetry add infrakit-python
+poetry add infrakit
 ```
 
 ## Usage
 
 ```python
-from infrakit import InfrakitClient
+import infrakit
 
-client = InfrakitClient.from_env()
+client = infrakit.Client.from_env()
 ```
 
 ## Development

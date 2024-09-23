@@ -1,1 +1,1 @@
-from .client import InfrakitClient
+from .client import InfrakitClient as Client

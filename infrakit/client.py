@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import os
 from typing import Generator, List, Optional
 
 import requests
@@ -17,10 +16,7 @@ class InfrakitClient(BaseModel):
     client_secret: str
 
     @classmethod
-    def from_env(cls, path: Optional[str] = None):
-
-        if path is not None:
-            load_dotenv(path)
+    def from_env(cls) -> InfrakitClient:
 
         class Settings(BaseSettings):
             customer_id: str
@@ -37,21 +33,26 @@ class InfrakitClient(BaseModel):
             client_secret=settings.client_secret,
         )
 
-    def base_url(self):
+    @classmethod
+    def from_env_file(cls, path: str) -> InfrakitClient:
+        load_dotenv(path)
+        return cls.from_env()
+
+    def base_url(self) -> str:
         if self.subdomain is None:
             subdomain = self.customer_id
         else:
             subdomain = self.subdomain
-        return f"https://{subdomain}.api.track.deepinspection.io/external/v0-alpha"
+        return f"https://{subdomain}.api.infrakit.com/api/v1"
 
-    def auth_headers(self):
+    def auth_headers(self) -> dict:
         return {
             "Authorization": f"Bearer {self.access_token()}",
             "X-Customer-ID": self.customer_id,
         }
 
-    def openid_connect_url(self):
-        return f"https://auth.nextml.com/auth/realms/deepinspection-track-{self.customer_id}/.well-known/openid-configuration"
+    def openid_connect_url(self) -> str:
+        return f"https://auth.infrakit.com/auth/realms/{self.customer_id}/.well-known/openid-configuration"
 
     def access_token(self) -> str:
         response = requests.get(self.openid_connect_url())
@@ -74,30 +75,22 @@ class InfrakitClient(BaseModel):
 
         return response.json()["access_token"]
 
+    @property
+    def alerts(self) -> Alerts:
+        return Alerts(client=self)
+
+
+class Alerts(BaseModel):
+    client: InfrakitClient
+
     def list(self) -> List[dict]:
-        url = f"{self.base_url()}/exports/fastenings"
-        response = requests.get(url, headers=self.auth_headers())
+        url = f"{self.client.base_url()}/alerts"
+        response = requests.get(url, headers=self.client.auth_headers())
         response.raise_for_status()
         return response.json()
 
-    def get(self, export_id) -> dict:
-        url = f"{self.base_url()}/exports/fastenings/{export_id}"
-        response = requests.get(url, headers=self.auth_headers())
+    def post(self, alert: dict) -> dict:
+        url = f"{self.client.base_url()}/alert"
+        response = requests.post(url, json=alert, headers=self.client.auth_headers())
         response.raise_for_status()
         return response.json()
-
-    def get_data(self, export_id) -> Generator[dict, None, None]:
-        url = f"{self.base_url()}/exports/fastenings/{export_id}/data"
-        response = requests.get(
-            url,
-            headers={
-                **self.auth_headers(),
-                "Accept": "application/x-ndjson",
-            },
-            stream=True,
-        )
-        response.raise_for_status()
-
-        for line in response.iter_lines():
-            if line:
-                yield json.loads(line.decode("utf-8"))
