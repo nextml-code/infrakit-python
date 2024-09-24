@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "infrakit-python"
+name = "infrakit"
 version = "0.1.0"
 description = ""
 authors = ["Richard Löwenström <samedii@gmail.com>"]
@@ -16,6 +16,7 @@ pydantic-settings = "^2.5.2"
 pytest = "^8.3.3"
 ipykernel = "^6.29.5"
 ipywidgets = "^8.1.5"
+ruff = "^0.6.7"
 
 [build-system]
 requires = ["poetry-core"]

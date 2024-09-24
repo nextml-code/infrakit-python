@@ -4,6 +4,7 @@ import pytest
 from requests.exceptions import HTTPError
 
 from infrakit.client import InfrakitClient
+from infrakit.document import Document, GeographicPoint
 from infrakit.project import Project, ProjectCreationResponse
 
 
@@ -27,8 +28,7 @@ def test_create_project(client: InfrakitClient):
         # Create a project with minimal required information
         new_project = client.projects.create(
             name=project_name,
-            end_date=datetime.now()
-            + timedelta(days=30),  # Set end date to 30 days from now
+            end_date=datetime.now() + timedelta(days=1),
         )
 
         assert isinstance(new_project, ProjectCreationResponse)
@@ -80,3 +80,35 @@ def test_create_folder(client: InfrakitClient):
 
     retrieved_folder = client.folder.get(folder_id=new_folder["uuid"])
     print(retrieved_folder)
+
+
+def test_create_document(client: InfrakitClient):
+    # List existing projects and use the first one
+    projects = client.projects.list()
+    assert len(projects) > 0, "No projects found"
+    project = projects[0]
+
+    # List folders within the project
+    folders_response = project.folders()
+    assert isinstance(folders_response, dict)
+    assert "folders" in folders_response
+    folders = folders_response["folders"]
+    assert len(folders) > 0, "No folders found in the project"
+
+    # Create a new document
+    document = Document(
+        name="Test Document",
+        url="https://github.com/nextml-code/infrakit-python",
+        projectId=project.id,
+        folderUuid=folders[0]["uuid"],
+        description="Test document description",
+        geographicPoint=GeographicPoint(
+            lat=57.49323582899631, lon=13.467711847423004, elevation=0.0
+        ),
+        auth=client.auth,
+    )
+
+    response = document.create()
+    print(response)
+    assert isinstance(response, dict)
+    assert response.get("status") is True
