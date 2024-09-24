@@ -12,24 +12,24 @@ class GeographicPoint(BaseModel):
 
 
 class Document(BaseModel):
-    name: str
-    url: str
-    projectId: int
-    folderUuid: str
-    description: Optional[str] = None
-    geographicPoint: Optional[GeographicPoint] = None
     auth: Auth
 
-    def create(self) -> Dict[str, Any]:
-        url = f"{self.auth.base_url()}/document/external"
+    def create(
+        self,
+        name: str,
+        url: str,
+        projectId: int,
+        folderUuid: str,
+        description: Optional[str] = None,
+        geographicPoint: Optional[GeographicPoint] = None,
+    ) -> Dict[str, Any]:
         payload = {
-            "name": self.name,
-            "url": self.url,
-            "projectId": self.projectId,
-            "folderUuid": self.folderUuid,
-            "description": self.description,
-            "geographicPoint": (
-                self.geographicPoint.model_dump() if self.geographicPoint else None
-            ),
+            "name": name,
+            "url": url,
+            "projectId": projectId,
+            "folderUuid": folderUuid,
+            "description": description,
+            "geographicPoint": geographicPoint.dict() if geographicPoint else None,
         }
+        url = f"{self.auth.base_url()}/document/external"
         return self.auth.post(url, json=payload)

@@ -4,7 +4,7 @@ import pytest
 from requests.exceptions import HTTPError
 
 from infrakit.client import InfrakitClient
-from infrakit.document import Document, GeographicPoint
+from infrakit.document import GeographicPoint
 from infrakit.project import Project, ProjectCreationResponse
 
 
@@ -96,7 +96,7 @@ def test_create_document(client: InfrakitClient):
     assert len(folders) > 0, "No folders found in the project"
 
     # Create a new document
-    document = Document(
+    response = client.document.create(
         name="Test Document",
         url="https://github.com/nextml-code/infrakit-python",
         projectId=project.id,
@@ -105,10 +105,7 @@ def test_create_document(client: InfrakitClient):
         geographicPoint=GeographicPoint(
             lat=57.49323582899631, lon=13.467711847423004, elevation=0.0
         ),
-        auth=client.auth,
     )
-
-    response = document.create()
     print(response)
     assert isinstance(response, dict)
     assert response.get("status") is True

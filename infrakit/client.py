@@ -3,6 +3,7 @@ from __future__ import annotations
 from pydantic import BaseModel
 
 from .auth import Auth
+from .document import Document
 from .folder import Folder
 from .mode import Mode
 from .projects import Projects
@@ -35,3 +36,7 @@ class InfrakitClient(BaseModel):
     @property
     def folder(self) -> Folder:
         return Folder(auth=self.auth)
+
+    @property
+    def document(self) -> Document:
+        return Document(auth=self.auth)
