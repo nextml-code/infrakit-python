@@ -18,10 +18,30 @@ poetry add infrakit
 ```python
 import infrakit
 
-client = infrakit.Client.from_env()
+client = infrakit.Client.from_credentials(
+    username="your-email",
+    password="your-password",
+)
 
-project = client.projects.list()[0]
+projects = client.projects.list()
+
+project = projects[0]
+
+folders = project.folders()
+
+client.document.create(
+    name="Test Document",
+    url="https://www.google.com",
+    projectId=project.id,
+    folderUuid=folders[0]["uuid"],
+    description="",
+    geographicPoint=GeographicPoint(
+        lat=50.0, lon=14.0, elevation=0.0
+    ),
+)
 ```
+
+## Development
 
 .env.secrets:
 
@@ -30,8 +50,6 @@ USERNAME=your-email
 PASSWORD=your-password
 MODE=production
 ```
-
-## Development
 
 ```bash
 poetry install
